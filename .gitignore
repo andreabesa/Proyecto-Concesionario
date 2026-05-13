@@ -1,4 +1,12 @@
 .venv
 csv/autos.xlsx
 csv/Libro1.csv
-
+.agents
+.firebase
+node_modules
+public
+.firebaserc
+firebase.json
+package-lock.json
+package.json
+skills-lock.json

@@ -725,7 +725,7 @@
     <header>
       <a class="logo" href="#">
         <div class="logo-dot"></div>
-        PrecioML
+        PPVSM
       </a>
       <span class="header-tag">v1.0 · ML MODEL</span>
     </header>
@@ -750,6 +750,7 @@
             <div class="field">
               <label>Tipo de vehiculo</label>
               <select id="city">
+                <option>Seleccione una tipo de vehiculo</option>
                 <option value="sedan">Sedan</option>
                 <option value="city car">City Car</option>
                 <option value="station_wagon">Station Wagon</option>
@@ -763,12 +764,46 @@
             <div class="field">
               <label>Marca</label>
               <select id="type">
-                <option value="piso">Piso</option>
-                <option value="casa">Casa / chalet</option>
-                <option value="duplex">Dúplex</option>
-                <option value="estudio">Estudio</option>
-                <option value="atico">Ático</option>
-                <option value="loft">Loft</option>
+                <option>Seleccione una marca</option>
+                <option value="volkswagen">Volkswagen</option>
+                <option value="skoda">Škoda</option>
+                <option value="bmw">BMW</option>
+                <option value="peugeot">Peugeot</option>
+                <option value="mazda">Mazda</option>
+                <option value="nissan">Nissan</option>
+                <option value="renault">Renault</option>
+                <option value="ford">Ford</option>
+                <option value="mercedes_benz">Mercedes-Benz</option>
+                <option value="honda">Honda</option>
+                <option value="fiat">Fiat</option>
+                <option value="mini">MINI</option>
+                <option value="opel">Opel</option>
+                <option value="smart">Smart</option>
+                <option value="audi">Audi</option>
+                <option value="subaru">Subaru</option>
+                <option value="mitsubishi">Mitsubishi</option>
+                <option value="hyundai">Hyundai</option>
+                <option value="alfa_romeo">Alfa Romeo</option>
+                <option value="seat">SEAT</option>
+                <option value="lancia">Lancia</option>
+                <option value="porsche">Porsche</option>
+                <option value="citroen">Citroën</option>
+                <option value="toyota">Toyota</option>
+                <option value="kia">Kia</option>
+                <option value="chevrolet">Chevrolet</option>
+                <option value="dacia">Dacia</option>
+                <option value="suzuki">Suzuki</option>
+                <option value="daihatsu">Daihatsu</option>
+                <option value="chrysler">Chrysler</option>
+                <option value="volvo">Volvo</option>
+                <option value="jaguar">Jaguar</option>
+                <option value="rover">Rover</option>
+                <option value="jeep">Jeep</option>
+                <option value="saab">Saab</option>
+                <option value="daewoo">Daewoo</option>
+                <option value="land_rover">Land Rover</option>
+                <option value="trabant">Trabant</option>
+                <option value="lada">Lada</option>
               </select>
             </div>
           </div>
@@ -789,6 +824,7 @@
             <div class="field">
               <label>Tipo de combustible</label>
               <select id="type">
+                <option>Seleccione tipo de combustible</option>
                 <option value="gasoline">Gasoline</option>
                 <option value="diesel">Diesel</option>
                 <option value="lpg">LPG</option>
@@ -800,17 +836,35 @@
             </div>
             <div class="field">
               <label>Mes de registro</label>
-              <input type="number" id="month_registration" value="1" min="1" max="12" />
+              <input
+                type="number"
+                id="month_registration"
+                value="1"
+                min="1"
+                max="12"
+              />
             </div>
             <div class="field">
               <label>Año de registro</label>
-              <input type="number" id="year_registration" value="2026" min="1900" max="2026" />
+              <input
+                type="number"
+                id="year_registration"
+                value="2026"
+                min="1900"
+                max="2026"
+              />
             </div>
           </div>
           <div class="grid-3">
             <div class="field">
               <label>Potencia</label>
-              <input type="number" id="power_ps" value="80" min="10" max="2000" />
+              <input
+                type="number"
+                id="power_ps"
+                value="80"
+                min="10"
+                max="2000"
+              />
             </div>
             <div class="field">
               <label>Kilometros</label>
@@ -909,42 +963,41 @@
             </div>
             <div class="field">
               <label>Reparacion</label>
-            <div class="chip" data-key="reparado" onclick="toggleChip(this)">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="rgba(240,237,232,0.4)"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 20h18" />
-                <path d="M5 20V10l7-7 7 7v10" />
-                <path d="M9 20v-5h6v5" />
-              </svg>
-              <span>Reparado</span>
+              <div class="chip" data-key="reparado" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 20h18" />
+                  <path d="M5 20V10l7-7 7 7v10" />
+                  <path d="M9 20v-5h6v5" />
+                </svg>
+                <span>Reparado</span>
+              </div>
+              <div class="chip" data-key="reparado" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 20h18" />
+                  <path d="M5 20V10l7-7 7 7v10" />
+                  <path d="M9 20v-5h6v5" />
+                </svg>
+                <span>No Reparado</span>
+              </div>
             </div>
-            <div class="chip" data-key="reparado" onclick="toggleChip(this)">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="rgba(240,237,232,0.4)"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 20h18" />
-                <path d="M5 20V10l7-7 7 7v10" />
-                <path d="M9 20v-5h6v5" />
-              </svg>
-              <span>No Reparado</span>
-            </div>
-                        </div>
-
           </div>
         </div>
 
