@@ -749,8 +749,8 @@
           <div class="grid-2" style="margin-bottom: 10px">
             <div class="field">
               <label>Tipo de vehiculo</label>
-              <select id="vehicle_type">
-                <option value="">Seleccione un tipo de vehiculo</option>
+              <select id="city">
+                <option>Seleccione una tipo de vehiculo</option>
                 <option value="sedan">Sedan</option>
                 <option value="city car">City Car</option>
                 <option value="station_wagon">Station Wagon</option>
@@ -761,16 +761,59 @@
                 <option value="other_vehicle">Other</option>
               </select>
             </div>
-            <div class="field" style="position:relative">
+            <div class="field">
               <label>Marca</label>
-              <input type="text" id="marca-input" placeholder="Escribe una marca..." autocomplete="off" />
-              <ul id="marca-lista" style="position:absolute;top:100%;left:0;right:0;z-index:100;list-style:none;padding:0;margin:4px 0 0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);max-height:200px;overflow-y:auto;display:none;"></ul>
+              <select id="type">
+                <option>Seleccione una marca</option>
+                <option value="volkswagen">Volkswagen</option>
+                <option value="skoda">Škoda</option>
+                <option value="bmw">BMW</option>
+                <option value="peugeot">Peugeot</option>
+                <option value="mazda">Mazda</option>
+                <option value="nissan">Nissan</option>
+                <option value="renault">Renault</option>
+                <option value="ford">Ford</option>
+                <option value="mercedes_benz">Mercedes-Benz</option>
+                <option value="honda">Honda</option>
+                <option value="fiat">Fiat</option>
+                <option value="mini">MINI</option>
+                <option value="opel">Opel</option>
+                <option value="smart">Smart</option>
+                <option value="audi">Audi</option>
+                <option value="subaru">Subaru</option>
+                <option value="mitsubishi">Mitsubishi</option>
+                <option value="hyundai">Hyundai</option>
+                <option value="alfa_romeo">Alfa Romeo</option>
+                <option value="seat">SEAT</option>
+                <option value="lancia">Lancia</option>
+                <option value="porsche">Porsche</option>
+                <option value="citroen">Citroën</option>
+                <option value="toyota">Toyota</option>
+                <option value="kia">Kia</option>
+                <option value="chevrolet">Chevrolet</option>
+                <option value="dacia">Dacia</option>
+                <option value="suzuki">Suzuki</option>
+                <option value="daihatsu">Daihatsu</option>
+                <option value="chrysler">Chrysler</option>
+                <option value="volvo">Volvo</option>
+                <option value="jaguar">Jaguar</option>
+                <option value="rover">Rover</option>
+                <option value="jeep">Jeep</option>
+                <option value="saab">Saab</option>
+                <option value="daewoo">Daewoo</option>
+                <option value="land_rover">Land Rover</option>
+                <option value="trabant">Trabant</option>
+                <option value="lada">Lada</option>
+              </select>
             </div>
           </div>
-          <div class="field" style="position:relative">
+          <div class="field">
             <label>Modelo del vehiculo</label>
-            <input type="text" id="modelo-input" placeholder="Primero selecciona una marca..." autocomplete="off" disabled />
-            <ul id="modelo-lista" style="position:absolute;top:100%;left:0;right:0;z-index:100;list-style:none;padding:0;margin:4px 0 0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);max-height:200px;overflow-y:auto;display:none;"></ul>
+            <input
+              type="text"
+              id="model_vehicle"
+              placeholder="ej. Golf, Sandero, Siroco..."
+            />
           </div>
         </div>
 
@@ -780,8 +823,8 @@
           <div class="grid-3" style="margin-bottom: 10px">
             <div class="field">
               <label>Tipo de combustible</label>
-              <select id="fuel_type">
-                <option value="">Seleccione tipo de combustible</option>
+              <select id="type">
+                <option>Seleccione tipo de combustible</option>
                 <option value="gasoline">Gasoline</option>
                 <option value="diesel">Diesel</option>
                 <option value="lpg">LPG</option>
@@ -806,7 +849,7 @@
               <input
                 type="number"
                 id="year_registration"
-                value="2015"
+                value="2026"
                 min="1900"
                 max="2026"
               />
@@ -814,7 +857,7 @@
           </div>
           <div class="grid-3">
             <div class="field">
-              <label>Potencia (CV)</label>
+              <label>Potencia</label>
               <input
                 type="number"
                 id="power_ps"
@@ -825,7 +868,7 @@
             </div>
             <div class="field">
               <label>Kilometros</label>
-              <input type="number" id="kilometers" value="100000" min="0" />
+              <input type="number" id="power_ps" value="0" min="0" />
             </div>
           </div>
         </div>
@@ -920,7 +963,7 @@
             </div>
             <div class="field">
               <label>Reparacion</label>
-              <div class="chip" data-key="yes" onclick="toggleChip(this)">
+              <div class="chip" data-key="reparado" onclick="toggleChip(this)">
                 <svg
                   width="16"
                   height="16"
@@ -937,7 +980,7 @@
                 </svg>
                 <span>Reparado</span>
               </div>
-              <div class="chip" data-key="no" onclick="toggleChip(this)">
+              <div class="chip" data-key="reparado" onclick="toggleChip(this)">
                 <svg
                   width="16"
                   height="16"
@@ -1025,7 +1068,7 @@
           </div>
           <div class="metrics-grid">
             <div class="metric-cell">
-              <div class="metric-label">Kilometraje</div>
+              <div class="metric-label">Precio / m²</div>
               <div class="metric-value" id="res-sqm">—</div>
             </div>
             <div class="metric-cell">
@@ -1065,135 +1108,24 @@
           currency: "EUR",
           maximumFractionDigits: 0,
         }).format(n);
+      const fmtSqm = (n) =>
+        new Intl.NumberFormat("es-ES", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(n) + "/m²";
 
-      // ── Chips ──────────────────────────────────────────────────────
       function toggleChip(el) {
-        // Para grupos de chips excluyentes (gearbox, damage), desactivar hermanos
-        const group = el.closest('.field');
-        if (group) group.querySelectorAll('.chip').forEach(c => c !== el && c.classList.remove('on'));
         el.classList.toggle("on");
       }
 
-      function getChipValue(groupSelector) {
-        const chip = document.querySelector(groupSelector + ' .chip.on');
-        return chip ? chip.dataset.key : null;
+      function getFeatures() {
+        return [...document.querySelectorAll(".chip.on")].map(
+          (c) => c.dataset.key,
+        );
       }
 
-      // ── Autocomplete marca → modelo ────────────────────────────────
-      const marcasModelos = {
-        volkswagen: ["golf","passat","polo","tiguan","touareg","sharan","phaeton","beetle","caddy","transporter","up","scirocco","eos","multivan","t-roc","arteon"],
-        bmw: ["3er","5er","1er","x5","x3","7er","x1","6er","2er","4er","m3","x6","z4","x2","8er"],
-        mercedes_benz: ["c-klasse","e-klasse","a-klasse","s-klasse","glk","m-klasse","b-klasse","slk","g-klasse","gl","cls","sl","cla","gla","gle"],
-        audi: ["a4","a3","a6","q5","a5","q3","a1","tt","q7","a8","a2","r8","rs4","s4","a7"],
-        opel: ["astra","vectra","corsa","zafira","insignia","meriva","antara","omega","agila","combo","mokka","crossland","grandland"],
-        ford: ["focus","fiesta","mondeo","kuga","galaxy","c-max","s-max","ka","transit","mustang","edge","puma","ranger"],
-        renault: ["megane","clio","laguna","scenic","twingo","kangoo","espace","koleos","zoe","captur","talisman","fluence"],
-        peugeot: ["207","307","407","206","308","508","3008","5008","106","406","607","208","2008","107"],
-        seat: ["ibiza","leon","altea","toledo","cordoba","alhambra","arona","ateca","tarraco","mii","exeo"],
-        skoda: ["octavia","fabia","superb","yeti","roomster","rapid","karoq","kodiaq","scala","citigo","enyaq"],
-        fiat: ["punto","bravo","stilo","panda","500","ducato","doblo","grande","multipla","tipo","uno","palio"],
-        toyota: ["corolla","avensis","yaris","rav4","land cruiser","auris","prius","celica","camry","hilux","c-hr","aygo"],
-        honda: ["civic","accord","cr-v","jazz","legend","hr-v","fr-v","insight","element","fit","city"],
-        hyundai: ["i30","tucson","santa fe","i20","getz","ix35","i40","ix20","accent","elantra","kona","ioniq"],
-        kia: ["sportage","ceed","sorento","picanto","rio","carens","stinger","niro","stonic","proceed","xceed"],
-        nissan: ["qashqai","micra","x-trail","almera","primera","note","murano","navara","juke","leaf","pulsar"],
-        mazda: ["mazda3","mazda6","cx-5","mx-5","mazda2","cx-3","cx-7","cx-9","rx-8","mazda5"],
-        volvo: ["s40","v50","xc90","s80","v70","c30","xc60","v40","s60","c70","xc40","v60"],
-        porsche: ["cayenne","911","boxster","cayman","macan","panamera","taycan","918"],
-        mini: ["mini","countryman","clubman","paceman","coupe","roadster","convertible"],
-        subaru: ["impreza","forester","outback","legacy","xv","tribeca","wrx","brz","levorg"],
-        mitsubishi: ["outlander","lancer","colt","galant","eclipse","pajero","asx","l200","carisma"],
-        alfa_romeo: ["156","147","159","166","gt","giulia","stelvio","giulietta","4c","brera","mito"],
-        citroen: ["c4","c3","berlingo","c5","picasso","c2","c1","ds4","ds5","xsara","c-elysee","ds3","jumpy"],
-        dacia: ["sandero","duster","logan","lodgy","dokker","spring"],
-        suzuki: ["swift","grand vitara","sx4","splash","alto","vitara","jimny","ignis","baleno"],
-        jeep: ["grand cherokee","cherokee","wrangler","compass","renegade","commander"],
-        land_rover: ["discovery","range rover","freelander","defender","evoque","velar"],
-        chevrolet: ["aveo","captiva","cruze","epica","lacetti","matiz","nubira","spark","trax"],
-        jaguar: ["x-type","xf","xj","xe","s-type","f-type","f-pace","e-pace","i-pace"],
-        saab: ["9-3","9-5","9-7x","900","9-2x"],
-        lancia: ["ypsilon","delta","musa","thesis","phedra","voyager"],
-        chrysler: ["300c","sebring","voyager","pt cruiser","grand voyager"],
-        smart: ["fortwo","forfour","roadster","crossblade"],
-        daewoo: ["matiz","kalos","lacetti","lanos","nubira","leganza","evanda"],
-        daihatsu: ["sirion","terios","cuore","materia","copen","charade"],
-        lada: ["niva","largus","kalina","priora","samara","vesta"],
-        rover: ["75","45","25","streetwise","metro","200","400","600"],
-        trabant: ["601","1.1","kombi"],
-      };
-
-      let marcaSeleccionada = null;
-
-      function crearLi(texto, onClick) {
-        const li = document.createElement('li');
-        li.textContent = texto;
-        li.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text);border-bottom:1px solid var(--border);';
-        li.addEventListener('mouseenter', () => li.style.background = 'var(--surface)');
-        li.addEventListener('mouseleave', () => li.style.background = '');
-        li.addEventListener('mousedown', (e) => { e.preventDefault(); onClick(); });
-        return li;
-      }
-
-      function filtrarMarcas(query) {
-        const lista = document.getElementById('marca-lista');
-        const resultados = Object.keys(marcasModelos)
-          .filter(m => m.includes(query.toLowerCase()))
-          .slice(0, 8);
-        if (!query || resultados.length === 0) { lista.style.display = 'none'; return; }
-        lista.innerHTML = '';
-        resultados.forEach(m => {
-          const label = m.charAt(0).toUpperCase() + m.slice(1).replace('_', ' ');
-          lista.appendChild(crearLi(label, () => seleccionarMarca(m, label)));
-        });
-        lista.style.display = 'block';
-      }
-
-      function seleccionarMarca(valor, label) {
-        marcaSeleccionada = valor;
-        document.getElementById('marca-input').value = label;
-        document.getElementById('marca-lista').style.display = 'none';
-        const modeloInput = document.getElementById('modelo-input');
-        modeloInput.disabled = false;
-        modeloInput.value = '';
-        modeloInput.placeholder = 'Escribe un modelo...';
-        document.getElementById('modelo-lista').style.display = 'none';
-      }
-
-      function filtrarModelos(query) {
-        const lista = document.getElementById('modelo-lista');
-        if (!marcaSeleccionada) return;
-        const modelos = marcasModelos[marcaSeleccionada] || [];
-        const resultados = modelos.filter(m => m.includes(query.toLowerCase())).slice(0, 8);
-        if (!query || resultados.length === 0) { lista.style.display = 'none'; return; }
-        lista.innerHTML = '';
-        resultados.forEach(m => {
-          const label = m.charAt(0).toUpperCase() + m.slice(1);
-          lista.appendChild(crearLi(label, () => {
-            document.getElementById('modelo-input').value = label;
-            lista.style.display = 'none';
-          }));
-        });
-        lista.style.display = 'block';
-      }
-
-      document.getElementById('marca-input').addEventListener('input', e => {
-        marcaSeleccionada = null;
-        const modeloInput = document.getElementById('modelo-input');
-        modeloInput.disabled = true;
-        modeloInput.value = '';
-        modeloInput.placeholder = 'Primero selecciona una marca...';
-        filtrarMarcas(e.target.value);
-      });
-      document.getElementById('marca-input').addEventListener('blur', () => {
-        setTimeout(() => document.getElementById('marca-lista').style.display = 'none', 150);
-      });
-      document.getElementById('modelo-input').addEventListener('input', e => filtrarModelos(e.target.value));
-      document.getElementById('modelo-input').addEventListener('blur', () => {
-        setTimeout(() => document.getElementById('modelo-lista').style.display = 'none', 150);
-      });
-
-      // ── Predict ────────────────────────────────────────────────────
-      const historyArr = [];
+      const history = [];
 
       async function predict() {
         const btn = document.getElementById("submit-btn");
@@ -1201,45 +1133,47 @@
         const resultCard = document.getElementById("result-card");
         const idleState = document.getElementById("idle-state");
 
-        const vehicleType  = document.getElementById("vehicle_type").value;
-        const marca        = document.getElementById("marca-input").value;
-        const modelo       = document.getElementById("modelo-input").value;
-        const fuelType     = document.getElementById("fuel_type").value;
-        const monthReg     = document.getElementById("month_registration").value;
-        const yearReg      = document.getElementById("year_registration").value;
-        const powerPs      = document.getElementById("power_ps").value;
-        const kilometers   = document.getElementById("kilometers").value;
-        const gearbox      = getChipValue('.field:has([data-key="manual"])') ;
-        const damage       = getChipValue('.field:has([data-key="yes"])');
+        const city = document.getElementById("city").value;
+        const type = document.getElementById("type").value;
+        const neighborhood = document
+          .getElementById("neighborhood")
+          .value.trim();
+        const area = parseInt(document.getElementById("area").value) || 80;
+        const rooms = parseInt(document.getElementById("rooms").value) || 3;
+        const baths = parseInt(document.getElementById("baths").value) || 1;
+        const floor = parseInt(document.getElementById("floor").value) || 3;
+        const year = parseInt(document.getElementById("year").value) || 1990;
+        const condition = document.getElementById("condition").value;
+        const features = getFeatures();
 
         errorBox.classList.remove("visible");
         btn.disabled = true;
         btn.innerHTML = '<div class="spinner"></div> Calculando...';
 
-        const prompt = `Eres un modelo de machine learning experto en valoración de vehículos de segunda mano.
+        const prompt = `Eres un modelo de machine learning experto en valoración inmobiliaria en España.
 Devuelve ÚNICAMENTE un objeto JSON válido, sin texto adicional, sin backticks, sin markdown.
 
-Datos del vehículo:
-- Tipo: ${vehicleType || "no especificado"}
-- Marca: ${marca || "no especificada"}
-- Modelo: ${modelo || "no especificado"}
-- Combustible: ${fuelType || "no especificado"}
-- Mes de registro: ${monthReg}
-- Año de registro: ${yearReg}
-- Potencia: ${powerPs} CV
-- Kilometraje: ${kilometers} km
-- Caja de cambios: ${gearbox || "no especificada"}
-- Daños sin reparar: ${damage === "yes" ? "Sí" : damage === "no" ? "No" : "no especificado"}
+Datos del inmueble:
+- Ciudad: ${city}${neighborhood ? ` (barrio: ${neighborhood})` : ""}
+- Tipo: ${type}
+- Superficie: ${area} m²
+- Habitaciones: ${rooms}
+- Baños: ${baths}
+- Planta: ${floor}
+- Año construcción: ${year}
+- Estado: ${condition}
+- Extras: ${features.length ? features.join(", ") : "ninguno"}
 
-Devuelve exactamente este JSON con valores realistas del mercado europeo actual:
-{"precio":0,"min":0,"max":0,"confianza":0,"percentil":0,"valoracion":"","insight":""}
+Devuelve exactamente este JSON con valores realistas del mercado español actual:
+{"precio":0,"min":0,"max":0,"sqm":0,"confianza":0,"percentil":0,"valoracion":"","insight":""}
 
 Donde:
 - precio: precio estimado en euros (entero)
 - min: precio mínimo del rango (precio - ~10%)
 - max: precio máximo del rango (precio + ~10%)
+- sqm: precio por metro cuadrado (entero)
 - confianza: porcentaje de confianza del modelo (entre 72 y 95, entero)
-- percentil: percentil del precio respecto a vehículos similares (entre 1 y 99, entero)
+- percentil: percentil del precio respecto a la zona (entre 1 y 99, entero)
 - valoracion: exactamente uno de ["Muy bajo", "Bajo", "Mercado", "Alto", "Premium"]
 - insight: frase corta de 1-2 oraciones con observación clave sobre el precio (en español)`;
 
@@ -1264,8 +1198,9 @@ Donde:
           const p = JSON.parse(raw);
 
           document.getElementById("res-price").textContent = fmt(p.precio);
-          document.getElementById("res-range").textContent = `${fmt(p.min)} — ${fmt(p.max)}`;
-          document.getElementById("res-sqm").textContent = `${kilometers} km`;
+          document.getElementById("res-range").textContent =
+            `${fmt(p.min)} — ${fmt(p.max)}`;
+          document.getElementById("res-sqm").textContent = fmtSqm(p.sqm);
           document.getElementById("res-pct").textContent = `P${p.percentil}`;
           document.getElementById("res-conf").textContent = `${p.confianza}%`;
           document.getElementById("res-insight").textContent = p.insight;
@@ -1274,13 +1209,15 @@ Donde:
           valEl.innerHTML = "";
           const badge = document.createElement("span");
           badge.textContent = p.valoracion;
-          badge.className = "valuation-badge " + ({
-            "Muy bajo": "val-verylow",
-            "Bajo": "val-low",
-            "Mercado": "val-market",
-            "Alto": "val-high",
-            "Premium": "val-premium",
-          }[p.valoracion] || "val-market");
+          badge.className =
+            "valuation-badge " +
+            ({
+              "Muy bajo": "val-verylow",
+              Bajo: "val-low",
+              Mercado: "val-market",
+              Alto: "val-high",
+              Premium: "val-premium",
+            }[p.valoracion] || "val-market");
           valEl.appendChild(badge);
 
           setTimeout(() => {
@@ -1290,9 +1227,10 @@ Donde:
           idleState.style.display = "none";
           resultCard.classList.add("visible");
 
-          const label = `${marca} ${modelo} · ${yearReg}`;
-          historyArr.unshift({ label, price: fmt(p.precio), type: vehicleType || "vehículo" });
-          if (historyArr.length > 4) historyArr.pop();
+          // Add to history
+          const label = `${area}m² · ${city}`;
+          history.unshift({ label, price: fmt(p.precio), type });
+          if (history.length > 4) history.pop();
           renderHistory();
         } catch (e) {
           errorBox.classList.add("visible");
@@ -1305,18 +1243,22 @@ Donde:
       function renderHistory() {
         const sec = document.getElementById("history-section");
         const list = document.getElementById("history-list");
-        if (historyArr.length === 0) { sec.style.display = "none"; return; }
+        if (history.length === 0) {
+          sec.style.display = "none";
+          return;
+        }
         sec.style.display = "flex";
         list.innerHTML = "";
-        historyArr.forEach((h) => {
+        history.forEach((h) => {
           const item = document.createElement("div");
           item.className = "history-item";
           item.innerHTML = `
-            <div class="history-left">
-              <span class="history-info">${h.label}</span>
-              <span class="history-price">${h.price}</span>
-            </div>
-            <span class="history-tag">${h.type}</span>`;
+      <div class="history-left">
+        <span class="history-info">${h.label}</span>
+        <span class="history-price">${h.price}</span>
+      </div>
+      <span class="history-tag">${h.type}</span>
+    `;
           list.appendChild(item);
         });
       }
