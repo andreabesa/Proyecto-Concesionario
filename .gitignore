@@ -1,4 +1,17 @@
 .venv
 csv/autos.xlsx
 csv/Libro1.csv
-
+.agents
+.firebase
+node_modules
+public
+.firebaserc
+firebase.json
+package-lock.json
+package.json
+skills-lock.json
+<<<<<<< HEAD
+__pycache__
+/model
+=======
+>>>>>>> c010fd1a5d7e04cac94e283ca37569026f69856a
