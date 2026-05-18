@@ -1,18 +1,18 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from predecir import predecir
-import os
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/')
-def index():
-    return send_from_directory('static', 'predictor-precios.html')
-
-@app.route('/predecir', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    datos = request.get_json()
-    precio = predecir(datos)
-    return jsonify({'precio_estimado': round(precio, 2)})
+    try:
+        datos = request.get_json()
+        precio = predecir(datos)
+        return jsonify({'precio': round(precio, 2)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)

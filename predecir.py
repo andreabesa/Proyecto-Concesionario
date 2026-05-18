@@ -3,8 +3,8 @@ import joblib
 import numpy as np
 import pandas as pd
 
-BASE  = os.path.dirname(os.path.abspath(__file__))
-MODEL = os.path.join(BASE, 'model')
+BASE  = os.path.dirname(os.path.abspath(__file__))  # folder where predecir.py lives
+MODEL = r'c:\Users\FUNDACION\Documents\Proyecto Final Concesionario\Proyecto-Concesionario\model'
 
 model      = joblib.load(os.path.join(MODEL, 'modelo.pkl'))
 columnas   = joblib.load(os.path.join(MODEL, 'columnas.pkl'))
@@ -17,14 +17,21 @@ def predecir(datos_usuario: dict) -> float:
     modelo = datos.pop('model', None)
 
     df = pd.DataFrame([datos])
+    print("1. After DataFrame:", df.shape, df.columns.tolist())
 
-    df['brand_encoded'] = freq_brand.get(marca, 0)
-    df['model_encoded'] = freq_model.get(modelo, 0)
+    df['brand_freq'] = freq_brand.get(marca, 0)
+    df['model_freq'] = freq_model.get(modelo, 0)
     df['antiguedad'] = 2026 - df['yearOfRegistration']
-    
+    print("2. After freq+antiguedad:", df.shape)
+
     df = pd.get_dummies(df, columns=['notRepairedDamage', 'vehicleType', 'fuelType'])
+    print("3. After get_dummies:", df.shape, df.columns.tolist())
+
     df = df.astype({col: int for col in df.select_dtypes('bool').columns})
+    print("4. columnas esperadas:", columnas)
+
     df = df.reindex(columns=columnas, fill_value=0)
+    print("5. After reindex:", df.shape)
 
     pred_log = model.predict(df)
     return float(np.expm1(pred_log)[0])
@@ -32,17 +39,17 @@ def predecir(datos_usuario: dict) -> float:
 
 if __name__ == '__main__':
     datos_prueba = {
-        'brand':              'toyota',
-        'model':              'auris',
-        'yearOfRegistration': 2016,
-        'monthOfRegistration': 6,
-        'yearOfPurchase':     2026,
-        'monthOfPurchase':    3,
-        'kilometer':          20000,
-        'powerPS':            130,
+        'brand':              'bmw',
+        'model':              '3er',
+        'yearOfRegistration': 1995,
+        'monthOfRegistration': 10,
+        'yearOfPurchase':     2016,
+        'monthOfPurchase':    4,
+        'kilometer':          150000,
+        'powerPS':            102,
         'vehicleType':        'sedan',
         'fuelType':           'gasoline',
-        'notRepairedDamage':  'no',
+        'notRepairedDamage':  'yes',
     }
 
     precio = predecir(datos_prueba)
