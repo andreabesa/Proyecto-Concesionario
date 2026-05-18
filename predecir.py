@@ -3,8 +3,8 @@ import joblib
 import numpy as np
 import pandas as pd
 
-BASE  = os.path.dirname(os.path.abspath(__file__))  # folder where predecir.py lives
-MODEL = r'c:\Users\FUNDACION\Documents\Proyecto Final Concesionario\Proyecto-Concesionario\model'
+BASE  = os.path.dirname(os.path.abspath(__file__))
+MODEL = os.path.join(BASE, 'model')
 
 model      = joblib.load(os.path.join(MODEL, 'modelo.pkl'))
 columnas   = joblib.load(os.path.join(MODEL, 'columnas.pkl'))
