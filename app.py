@@ -1,9 +1,9 @@
+from predecir import predecir
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from predecir import predecir
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://ppvsm26.firebaseapp.com", "https://ppvsm26.web.app"])
 
 @app.route('/predict', methods=['POST'])
 def predict():
