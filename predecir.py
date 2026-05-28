@@ -19,8 +19,8 @@ def predecir(datos_usuario: dict) -> float:
     df = pd.DataFrame([datos])
     print("1. After DataFrame:", df.shape, df.columns.tolist())
 
-    df['brand_freq'] = freq_brand.get(marca, 0)
-    df['model_freq'] = freq_model.get(modelo, 0)
+    df['brand_encoded'] = freq_brand.get(marca, 0)
+    df['model_encoded'] = freq_model.get(modelo, 0)
     df['antiguedad'] = 2026 - df['yearOfRegistration']
     print("2. After freq+antiguedad:", df.shape)
 
