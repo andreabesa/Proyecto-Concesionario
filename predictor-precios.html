@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrecioML — Predictor de precios inmobiliarios</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #0d0d0f;
+        --surface: #17171a;
+        --surface2: #1e1e22;
+        --border: rgba(255, 255, 255, 0.07);
+        --border2: rgba(255, 255, 255, 0.12);
+        --accent: #c8f135;
+        --accent2: #a8d420;
+        --text: #f0ede8;
+        --muted: rgba(240, 237, 232, 0.45);
+        --muted2: rgba(240, 237, 232, 0.25);
+        --danger: #ff6b6b;
+        --success: #c8f135;
+        --radius: 10px;
+        --radius-lg: 16px;
+      }
+
+      html {
+        font-size: 16px;
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ── Noise overlay ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── Accent blob ── */
+      body::after {
+        content: "";
+        position: fixed;
+        top: -20vh;
+        right: -10vw;
+        width: 60vw;
+        height: 60vw;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle,
+          rgba(200, 241, 53, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* ── Header ── */
+      header {
+        position: relative;
+        z-index: 1;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: "DM Serif Display", serif;
+        font-size: 1.4rem;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .logo-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 2.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.8);
+        }
+      }
+
+      .header-tag {
+        font-family: "DM Mono", monospace;
+        font-size: 0.7rem;
+        padding: 4px 10px;
+        border: 1px solid var(--border2);
+        border-radius: 20px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+      }
+
+      /* ── Main layout ── */
+      main {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 0;
+        max-width: 1100px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 2.5rem 2rem;
+        gap: 2rem;
+      }
+
+      /* ── Left panel ── */
+      .panel-left {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .panel-title {
+        font-family: "DM Serif Display", serif;
+        font-size: 2rem;
+        font-weight: 400;
+        line-height: 1.15;
+        margin-bottom: 0.25rem;
+      }
+
+      .panel-title em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .panel-desc {
+        font-size: 0.875rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 0.5rem;
+      }
+
+      /* ── Section ── */
+      .section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+      }
+
+      .section-title {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── Form fields ── */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .field label {
+        font-size: 0.72rem;
+        font-family: "DM Mono", monospace;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+
+      .field input,
+      .field select {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.875rem;
+        padding: 9px 12px;
+        width: 100%;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        appearance: none;
+      }
+
+      .field select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(240,237,232,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        outline: none;
+        border-color: rgba(200, 241, 53, 0.4);
+        box-shadow: 0 0 0 3px rgba(200, 241, 53, 0.08);
+      }
+
+      .field input::placeholder {
+        color: var(--muted2);
+      }
+
+      .suffix-wrap {
+        position: relative;
+      }
+      .suffix-wrap input {
+        padding-right: 38px;
+      }
+      .suffix-unit {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.75rem;
+        font-family: "DM Mono", monospace;
+        color: var(--muted);
+        pointer-events: none;
+      }
+
+      /* ── Feature chips ── */
+      .chips-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.18s;
+        user-select: none;
+      }
+
+      .chip:hover {
+        border-color: var(--border2);
+      }
+
+      .chip.on {
+        background: rgba(200, 241, 53, 0.08);
+        border-color: rgba(200, 241, 53, 0.35);
+      }
+
+      .chip svg {
+        flex-shrink: 0;
+      }
+      .chip span {
+        font-size: 0.8rem;
+        color: var(--muted);
+        transition: color 0.18s;
+      }
+      .chip.on span {
+        color: var(--accent);
+      }
+      .chip.on svg path,
+      .chip.on svg polyline,
+      .chip.on svg circle,
+      .chip.on svg rect,
+      .chip.on svg line {
+        stroke: var(--accent);
+      }
+
+      /* ── Submit button ── */
+      .submit-btn {
+        width: 100%;
+        padding: 14px;
+        background: var(--accent);
+        color: #0d0d0f;
+        border: none;
+        border-radius: var(--radius);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition:
+          background 0.2s,
+          transform 0.12s;
+        letter-spacing: 0.01em;
+        margin-top: 0.5rem;
+      }
+
+      .submit-btn:hover {
+        background: var(--accent2);
+      }
+      .submit-btn:active {
+        transform: scale(0.98);
+      }
+      .submit-btn:disabled {
+        background: rgba(200, 241, 53, 0.2);
+        color: rgba(13, 13, 15, 0.5);
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(13, 13, 15, 0.3);
+        border-top-color: #0d0d0f;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Right panel ── */
+      .panel-right {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        position: sticky;
+        top: 2rem;
+        align-self: start;
+      }
+
+      /* ── Idle state ── */
+      .idle-state {
+        background: var(--surface);
+        border: 1px dashed var(--border2);
+        border-radius: var(--radius-lg);
+        padding: 3rem 2rem;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .idle-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .idle-state p {
+        font-size: 0.8rem;
+        color: var(--muted);
+        max-width: 200px;
+        line-height: 1.6;
+      }
+
+      /* ── Result card ── */
+      .result-card {
+        background: var(--surface);
+        border: 1px solid rgba(200, 241, 53, 0.2);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        display: none;
+        animation: slideUp 0.4s ease;
+      }
+
+      .result-card.visible {
+        display: block;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .result-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .result-header::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          circle at top right,
+          rgba(200, 241, 53, 0.07) 0%,
+          transparent 60%
+        );
+      }
+
+      .result-eyebrow {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        color: var(--accent);
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+        position: relative;
+      }
+
+      .result-price {
+        font-family: "DM Serif Display", serif;
+        font-size: 2.8rem;
+        font-weight: 400;
+        color: var(--text);
+        line-height: 1;
+        position: relative;
+      }
+
+      .result-range {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 0.4rem;
+        font-family: "DM Mono", monospace;
+        position: relative;
+      }
+
+      .confidence-row {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .conf-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .conf-label span:last-child {
+        color: var(--accent);
+      }
+
+      .bar-track {
+        height: 4px;
+        background: var(--surface2);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .metric-cell {
+        padding: 1rem 1.25rem;
+        border-right: 1px solid var(--border);
+      }
+
+      .metric-cell:last-child {
+        border-right: none;
+      }
+
+      .metric-label {
+        font-family: "DM Mono", monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        color: var(--muted2);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .metric-value {
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .valuation-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.72rem;
+        font-weight: 500;
+        padding: 3px 9px;
+        border-radius: 20px;
+        margin-top: 2px;
+      }
+
+      .val-market {
+        background: rgba(200, 241, 53, 0.12);
+        color: var(--accent);
+      }
+      .val-low {
+        background: rgba(100, 180, 255, 0.1);
+        color: #64b4ff;
+      }
+      .val-high {
+        background: rgba(255, 160, 80, 0.1);
+        color: #ffa050;
+      }
+      .val-premium {
+        background: rgba(220, 80, 200, 0.1);
+        color: #dc50c8;
+      }
+      .val-verylow {
+        background: rgba(100, 200, 255, 0.1);
+        color: #64c8ff;
+      }
+
+      .insight-box {
+        padding: 1rem 1.5rem;
+      }
+
+      .insight-text {
+        font-size: 0.82rem;
+        color: var(--muted);
+        line-height: 1.65;
+        font-style: italic;
+      }
+
+      /* ── Error ── */
+      .error-box {
+        background: rgba(255, 107, 107, 0.07);
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        border-radius: var(--radius);
+        padding: 12px 16px;
+        font-size: 0.8rem;
+        color: #ff9999;
+        display: none;
+        margin-top: 8px;
+      }
+
+      .error-box.visible {
+        display: block;
+      }
+
+      /* ── History ── */
+      .history-section {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .history-title {
+        font-family: "DM Mono", monospace;
+        font-size: 0.65rem;
+        letter-spacing: 0.1em;
+        color: var(--muted2);
+        text-transform: uppercase;
+        padding: 0 4px;
+      }
+
+      .history-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        animation: slideUp 0.3s ease;
+      }
+
+      .history-item:hover {
+        border-color: var(--border2);
+      }
+
+      .history-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .history-info {
+        font-size: 0.78rem;
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+      }
+
+      .history-price {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text);
+      }
+
+      .history-tag {
+        font-size: 0.65rem;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: var(--surface2);
+        color: var(--muted);
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ── Footer ── */
+      footer {
+        position: relative;
+        z-index: 1;
+        padding: 1.25rem 2rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      footer p {
+        font-size: 0.72rem;
+        color: var(--muted2);
+        font-family: "DM Mono", monospace;
+      }
+
+      .footer-note {
+        font-size: 0.72rem;
+        color: var(--muted2);
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 760px) {
+        main {
+          grid-template-columns: 1fr;
+          padding: 1.25rem;
+          gap: 1.25rem;
+        }
+        .panel-right {
+          position: static;
+        }
+        .panel-title {
+          font-size: 1.5rem;
+        }
+        .chips-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .grid-3 {
+          grid-template-columns: 1fr 1fr;
+        }
+        .metrics-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .metric-cell:last-child {
+          grid-column: span 2;
+          border-right: none;
+        }
+        header {
+          padding: 1rem 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a class="logo" href="#">
+        <div class="logo-dot"></div>
+        PPVSM
+      </a>
+      <span class="header-tag">v1.0 · ML MODEL</span>
+    </header>
+
+    <main>
+      <!-- LEFT: Form -->
+      <div class="panel-left">
+        <div>
+          <h1 class="panel-title">
+            Estima el <em>precio real</em> de tu vehiculo de segunda mano
+          </h1>
+          <p class="panel-desc">
+            Introduce los datos del vehiculo y el modelo de machine learning
+            calculará su valor de mercado en segundos.
+          </p>
+        </div>
+
+        <!-- Sección 1:  Marca y modelo -->
+        <div class="section">
+          <p class="section-title">01 · Marca y modelo</p>
+          <div class="grid-2" style="margin-bottom: 10px">
+            <div class="field">
+              <label>Tipo de vehiculo</label>
+              <select id="vehicle_type">
+                <option value="">Seleccione un tipo de vehiculo</option>
+                <option value="sedan">Sedan</option>
+                <option value="city car">City Car</option>
+                <option value="station_wagon">Station Wagon</option>
+                <option value="van">Van</option>
+                <option value="convertible">Convertible</option>
+                <option value="coupe">Coupe</option>
+                <option value="suv">Suv</option>
+                <option value="other_vehicle">Other</option>
+              </select>
+            </div>
+            <div class="field" style="position:relative">
+              <label>Marca</label>
+              <input type="text" id="marca-input" placeholder="Escribe una marca..." autocomplete="off" />
+              <ul id="marca-lista" style="position:absolute;top:100%;left:0;right:0;z-index:100;list-style:none;padding:0;margin:4px 0 0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);max-height:200px;overflow-y:auto;display:none;"></ul>
+            </div>
+          </div>
+          <div class="field" style="position:relative">
+            <label>Modelo del vehiculo</label>
+            <input type="text" id="modelo-input" placeholder="Primero selecciona una marca..." autocomplete="off" disabled />
+            <ul id="modelo-lista" style="position:absolute;top:100%;left:0;right:0;z-index:100;list-style:none;padding:0;margin:4px 0 0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);max-height:200px;overflow-y:auto;display:none;"></ul>
+          </div>
+        </div>
+
+        <!-- Sección 2: Características -->
+        <div class="section">
+          <p class="section-title">02 · Características</p>
+          <div class="grid-3" style="margin-bottom: 10px">
+            <div class="field">
+              <label>Tipo de combustible</label>
+              <select id="fuel_type">
+                <option value="">Seleccione tipo de combustible</option>
+                <option value="gasoline">Gasoline</option>
+                <option value="diesel">Diesel</option>
+                <option value="lpg">LPG</option>
+                <option value="cng">CNG</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="electric">Electric</option>
+                <option value="other_fuel">Other</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Mes de registro</label>
+              <input
+                type="number"
+                id="month_registration"
+                value="1"
+                min="1"
+                max="12"
+              />
+            </div>
+            <div class="field">
+              <label>Año de registro</label>
+              <input
+                type="number"
+                id="year_registration"
+                value="2015"
+                min="1900"
+                max="2026"
+              />
+            </div>
+          </div>
+          <div class="grid-3">
+            <div class="field">
+              <label>Potencia (CV)</label>
+              <input
+                type="number"
+                id="power_ps"
+                value="80"
+                min="10"
+                max="2000"
+              />
+            </div>
+            <div class="field">
+              <label>Kilometros</label>
+              <input type="number" id="kilometers" value="100000" min="0" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 3: Extras -->
+        <div class="section">
+          <p class="section-title">03 · Extras</p>
+          <div class="chips-grid" id="chips">
+            <div class="field">
+              <label>AB Test</label>
+              <div class="chip" data-key="test" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="8" width="20" height="13" rx="2" />
+                  <path d="M6 8V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3" />
+                  <line x1="12" y1="12" x2="12" y2="17" />
+                  <line x1="9" y1="14.5" x2="15" y2="14.5" />
+                </svg>
+                <span>Test</span>
+              </div>
+
+              <div class="chip" data-key="control" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="2" y="8" width="20" height="13" rx="2" />
+                  <path d="M6 8V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v3" />
+                  <line x1="12" y1="12" x2="12" y2="17" />
+                  <line x1="9" y1="14.5" x2="15" y2="14.5" />
+                </svg>
+                <span>Control</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Caja de cambios</label>
+              <div class="chip" data-key="manual" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="5" y="2" width="14" height="20" rx="2" />
+                  <path d="M9 10l3-3 3 3" />
+                  <path d="M9 14l3 3 3-3" />
+                </svg>
+                <span>Manual</span>
+              </div>
+
+              <div
+                class="chip"
+                data-key="automatico"
+                onclick="toggleChip(this)"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M2 12h20" />
+                  <path d="M2 16c2.5-2 5-2 7.5 0s5 2 7.5 0" />
+                  <path d="M2 20c2.5-2 5-2 7.5 0s5 2 7.5 0" />
+                  <circle cx="12" cy="6" r="2" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                </svg>
+                <span>Automatico</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Reparacion</label>
+              <div class="chip" data-key="yes" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 20h18" />
+                  <path d="M5 20V10l7-7 7 7v10" />
+                  <path d="M9 20v-5h6v5" />
+                </svg>
+                <span>Reparado</span>
+              </div>
+              <div class="chip" data-key="no" onclick="toggleChip(this)">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(240,237,232,0.4)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 20h18" />
+                  <path d="M5 20V10l7-7 7 7v10" />
+                  <path d="M9 20v-5h6v5" />
+                </svg>
+                <span>No Reparado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-btn" id="submit-btn" onclick="predict()">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 2a10 10 0 1 0 10 10" />
+            <path d="M22 2L12 12" />
+            <path d="M16 2h6v6" />
+          </svg>
+          Calcular precio
+        </button>
+
+        <div class="error-box" id="error-box">
+          ⚠ No se pudo obtener la predicción. Verifica tu conexión e inténtalo
+          de nuevo.
+        </div>
+      </div>
+
+      <!-- RIGHT: Result -->
+      <div class="panel-right">
+        <!-- Idle -->
+        <div class="idle-state" id="idle-state">
+          <div class="idle-icon">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="rgba(240,237,232,0.35)"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9,22 9,12 15,12 15,22" />
+            </svg>
+          </div>
+          <p>
+            Introduce los datos del vehiculo y pulsa
+            <em>Calcular precio</em> para ver la estimación.
+          </p>
+        </div>
+
+        <!-- Result -->
+        <div class="result-card" id="result-card">
+          <div class="result-header">
+            <p class="result-eyebrow">Precio estimado por ML</p>
+            <p class="result-price" id="res-price">—</p>
+            <p class="result-range" id="res-range"></p>
+          </div>
+          <div class="confidence-row">
+            <div class="conf-label">
+              <span>Confianza del modelo</span>
+              <span id="res-conf">—</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" id="bar-fill"></div>
+            </div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-cell">
+              <div class="metric-label">Kilometraje</div>
+              <div class="metric-value" id="res-sqm">—</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-label">Percentil zona</div>
+              <div class="metric-value" id="res-pct">—</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-label">Valoración</div>
+              <div class="metric-value" id="res-val">—</div>
+            </div>
+          </div>
+          <div class="insight-box">
+            <p class="insight-text" id="res-insight">—</p>
+          </div>
+        </div>
+
+        <!-- History -->
+        <div class="history-section" id="history-section" style="display: none">
+          <p class="history-title">Consultas recientes</p>
+          <div id="history-list"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>© 2026 PrecioML — Predictor para concesionarios con ML</p>
+      <span class="footer-note"
+        >Los precios son estimaciones orientativas, no valoraciones
+        oficiales</span
+      >
+    </footer>
+
+    <script>
+      const fmt = (n) =>
+        new Intl.NumberFormat("es-ES", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(n);
+
+      // ── Chips ──────────────────────────────────────────────────────
+      function toggleChip(el) {
+        // Para grupos de chips excluyentes (gearbox, damage), desactivar hermanos
+        const group = el.closest('.field');
+        if (group) group.querySelectorAll('.chip').forEach(c => c !== el && c.classList.remove('on'));
+        el.classList.toggle("on");
+      }
+
+      function getChipValue(groupSelector) {
+        const chip = document.querySelector(groupSelector + ' .chip.on');
+        return chip ? chip.dataset.key : null;
+      }
+
+      // ── Autocomplete marca → modelo ────────────────────────────────
+      const marcasModelos = {
+        volkswagen: ["golf","passat","polo","tiguan","touareg","sharan","phaeton","beetle","caddy","transporter","up","scirocco","eos","multivan","t-roc","arteon"],
+        bmw: ["3er","5er","1er","x5","x3","7er","x1","6er","2er","4er","m3","x6","z4","x2","8er"],
+        mercedes_benz: ["c-klasse","e-klasse","a-klasse","s-klasse","glk","m-klasse","b-klasse","slk","g-klasse","gl","cls","sl","cla","gla","gle"],
+        audi: ["a4","a3","a6","q5","a5","q3","a1","tt","q7","a8","a2","r8","rs4","s4","a7"],
+        opel: ["astra","vectra","corsa","zafira","insignia","meriva","antara","omega","agila","combo","mokka","crossland","grandland"],
+        ford: ["focus","fiesta","mondeo","kuga","galaxy","c-max","s-max","ka","transit","mustang","edge","puma","ranger"],
+        renault: ["megane","clio","laguna","scenic","twingo","kangoo","espace","koleos","zoe","captur","talisman","fluence"],
+        peugeot: ["207","307","407","206","308","508","3008","5008","106","406","607","208","2008","107"],
+        seat: ["ibiza","leon","altea","toledo","cordoba","alhambra","arona","ateca","tarraco","mii","exeo"],
+        skoda: ["octavia","fabia","superb","yeti","roomster","rapid","karoq","kodiaq","scala","citigo","enyaq"],
+        fiat: ["punto","bravo","stilo","panda","500","ducato","doblo","grande","multipla","tipo","uno","palio"],
+        toyota: ["corolla","avensis","yaris","rav4","land cruiser","auris","prius","celica","camry","hilux","c-hr","aygo"],
+        honda: ["civic","accord","cr-v","jazz","legend","hr-v","fr-v","insight","element","fit","city"],
+        hyundai: ["i30","tucson","santa fe","i20","getz","ix35","i40","ix20","accent","elantra","kona","ioniq"],
+        kia: ["sportage","ceed","sorento","picanto","rio","carens","stinger","niro","stonic","proceed","xceed"],
+        nissan: ["qashqai","micra","x-trail","almera","primera","note","murano","navara","juke","leaf","pulsar"],
+        mazda: ["mazda3","mazda6","cx-5","mx-5","mazda2","cx-3","cx-7","cx-9","rx-8","mazda5"],
+        volvo: ["s40","v50","xc90","s80","v70","c30","xc60","v40","s60","c70","xc40","v60"],
+        porsche: ["cayenne","911","boxster","cayman","macan","panamera","taycan","918"],
+        mini: ["mini","countryman","clubman","paceman","coupe","roadster","convertible"],
+        subaru: ["impreza","forester","outback","legacy","xv","tribeca","wrx","brz","levorg"],
+        mitsubishi: ["outlander","lancer","colt","galant","eclipse","pajero","asx","l200","carisma"],
+        alfa_romeo: ["156","147","159","166","gt","giulia","stelvio","giulietta","4c","brera","mito"],
+        citroen: ["c4","c3","berlingo","c5","picasso","c2","c1","ds4","ds5","xsara","c-elysee","ds3","jumpy"],
+        dacia: ["sandero","duster","logan","lodgy","dokker","spring"],
+        suzuki: ["swift","grand vitara","sx4","splash","alto","vitara","jimny","ignis","baleno"],
+        jeep: ["grand cherokee","cherokee","wrangler","compass","renegade","commander"],
+        land_rover: ["discovery","range rover","freelander","defender","evoque","velar"],
+        chevrolet: ["aveo","captiva","cruze","epica","lacetti","matiz","nubira","spark","trax"],
+        jaguar: ["x-type","xf","xj","xe","s-type","f-type","f-pace","e-pace","i-pace"],
+        saab: ["9-3","9-5","9-7x","900","9-2x"],
+        lancia: ["ypsilon","delta","musa","thesis","phedra","voyager"],
+        chrysler: ["300c","sebring","voyager","pt cruiser","grand voyager"],
+        smart: ["fortwo","forfour","roadster","crossblade"],
+        daewoo: ["matiz","kalos","lacetti","lanos","nubira","leganza","evanda"],
+        daihatsu: ["sirion","terios","cuore","materia","copen","charade"],
+        lada: ["niva","largus","kalina","priora","samara","vesta"],
+        rover: ["75","45","25","streetwise","metro","200","400","600"],
+        trabant: ["601","1.1","kombi"],
+      };
+
+      let marcaSeleccionada = null;
+
+      function crearLi(texto, onClick) {
+        const li = document.createElement('li');
+        li.textContent = texto;
+        li.style.cssText = 'padding:8px 12px;cursor:pointer;font-size:0.85rem;color:var(--text);border-bottom:1px solid var(--border);';
+        li.addEventListener('mouseenter', () => li.style.background = 'var(--surface)');
+        li.addEventListener('mouseleave', () => li.style.background = '');
+        li.addEventListener('mousedown', (e) => { e.preventDefault(); onClick(); });
+        return li;
+      }
+
+      function filtrarMarcas(query) {
+        const lista = document.getElementById('marca-lista');
+        const resultados = Object.keys(marcasModelos)
+          .filter(m => m.includes(query.toLowerCase()))
+          .slice(0, 8);
+        if (!query || resultados.length === 0) { lista.style.display = 'none'; return; }
+        lista.innerHTML = '';
+        resultados.forEach(m => {
+          const label = m.charAt(0).toUpperCase() + m.slice(1).replace('_', ' ');
+          lista.appendChild(crearLi(label, () => seleccionarMarca(m, label)));
+        });
+        lista.style.display = 'block';
+      }
+
+      function seleccionarMarca(valor, label) {
+        marcaSeleccionada = valor;
+        document.getElementById('marca-input').value = label;
+        document.getElementById('marca-lista').style.display = 'none';
+        const modeloInput = document.getElementById('modelo-input');
+        modeloInput.disabled = false;
+        modeloInput.value = '';
+        modeloInput.placeholder = 'Escribe un modelo...';
+        document.getElementById('modelo-lista').style.display = 'none';
+      }
+
+      function filtrarModelos(query) {
+        const lista = document.getElementById('modelo-lista');
+        if (!marcaSeleccionada) return;
+        const modelos = marcasModelos[marcaSeleccionada] || [];
+        const resultados = modelos.filter(m => m.includes(query.toLowerCase())).slice(0, 8);
+        if (!query || resultados.length === 0) { lista.style.display = 'none'; return; }
+        lista.innerHTML = '';
+        resultados.forEach(m => {
+          const label = m.charAt(0).toUpperCase() + m.slice(1);
+          lista.appendChild(crearLi(label, () => {
+            document.getElementById('modelo-input').value = label;
+            lista.style.display = 'none';
+          }));
+        });
+        lista.style.display = 'block';
+      }
+
+      document.getElementById('marca-input').addEventListener('input', e => {
+        marcaSeleccionada = null;
+        const modeloInput = document.getElementById('modelo-input');
+        modeloInput.disabled = true;
+        modeloInput.value = '';
+        modeloInput.placeholder = 'Primero selecciona una marca...';
+        filtrarMarcas(e.target.value);
+      });
+      document.getElementById('marca-input').addEventListener('blur', () => {
+        setTimeout(() => document.getElementById('marca-lista').style.display = 'none', 150);
+      });
+      document.getElementById('modelo-input').addEventListener('input', e => filtrarModelos(e.target.value));
+      document.getElementById('modelo-input').addEventListener('blur', () => {
+        setTimeout(() => document.getElementById('modelo-lista').style.display = 'none', 150);
+      });
+
+      // ── Predict ────────────────────────────────────────────────────
+      const historyArr = [];
+
+      async function predict() {
+        const btn = document.getElementById("submit-btn");
+        const errorBox = document.getElementById("error-box");
+        const resultCard = document.getElementById("result-card");
+        const idleState = document.getElementById("idle-state");
+
+        const vehicleType  = document.getElementById("vehicle_type").value;
+        const marca        = document.getElementById("marca-input").value;
+        const modelo       = document.getElementById("modelo-input").value;
+        const fuelType     = document.getElementById("fuel_type").value;
+        const monthReg     = document.getElementById("month_registration").value;
+        const yearReg      = document.getElementById("year_registration").value;
+        const powerPs      = document.getElementById("power_ps").value;
+        const kilometers   = document.getElementById("kilometers").value;
+        const gearbox      = getChipValue('.field:has([data-key="manual"])') ;
+        const damage       = getChipValue('.field:has([data-key="yes"])');
+
+        errorBox.classList.remove("visible");
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div> Calculando...';
+
+        const prompt = `Eres un modelo de machine learning experto en valoración de vehículos de segunda mano.
+Devuelve ÚNICAMENTE un objeto JSON válido, sin texto adicional, sin backticks, sin markdown.
+
+Datos del vehículo:
+- Tipo: ${vehicleType || "no especificado"}
+- Marca: ${marca || "no especificada"}
+- Modelo: ${modelo || "no especificado"}
+- Combustible: ${fuelType || "no especificado"}
+- Mes de registro: ${monthReg}
+- Año de registro: ${yearReg}
+- Potencia: ${powerPs} CV
+- Kilometraje: ${kilometers} km
+- Caja de cambios: ${gearbox || "no especificada"}
+- Daños sin reparar: ${damage === "yes" ? "Sí" : damage === "no" ? "No" : "no especificado"}
+
+Devuelve exactamente este JSON con valores realistas del mercado europeo actual:
+{"precio":0,"min":0,"max":0,"confianza":0,"percentil":0,"valoracion":"","insight":""}
+
+Donde:
+- precio: precio estimado en euros (entero)
+- min: precio mínimo del rango (precio - ~10%)
+- max: precio máximo del rango (precio + ~10%)
+- confianza: porcentaje de confianza del modelo (entre 72 y 95, entero)
+- percentil: percentil del precio respecto a vehículos similares (entre 1 y 99, entero)
+- valoracion: exactamente uno de ["Muy bajo", "Bajo", "Mercado", "Alto", "Premium"]
+- insight: frase corta de 1-2 oraciones con observación clave sobre el precio (en español)`;
+
+        try {
+          const res = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-20250514",
+              max_tokens: 400,
+              messages: [{ role: "user", content: prompt }],
+            }),
+          });
+
+          const data = await res.json();
+          const raw = data.content
+            .map((b) => b.text || "")
+            .join("")
+            .trim()
+            .replace(/```json|```/g, "")
+            .trim();
+          const p = JSON.parse(raw);
+
+          document.getElementById("res-price").textContent = fmt(p.precio);
+          document.getElementById("res-range").textContent = `${fmt(p.min)} — ${fmt(p.max)}`;
+          document.getElementById("res-sqm").textContent = `${kilometers} km`;
+          document.getElementById("res-pct").textContent = `P${p.percentil}`;
+          document.getElementById("res-conf").textContent = `${p.confianza}%`;
+          document.getElementById("res-insight").textContent = p.insight;
+
+          const valEl = document.getElementById("res-val");
+          valEl.innerHTML = "";
+          const badge = document.createElement("span");
+          badge.textContent = p.valoracion;
+          badge.className = "valuation-badge " + ({
+            "Muy bajo": "val-verylow",
+            "Bajo": "val-low",
+            "Mercado": "val-market",
+            "Alto": "val-high",
+            "Premium": "val-premium",
+          }[p.valoracion] || "val-market");
+          valEl.appendChild(badge);
+
+          setTimeout(() => {
+            document.getElementById("bar-fill").style.width = p.confianza + "%";
+          }, 100);
+
+          idleState.style.display = "none";
+          resultCard.classList.add("visible");
+
+          const label = `${marca} ${modelo} · ${yearReg}`;
+          historyArr.unshift({ label, price: fmt(p.precio), type: vehicleType || "vehículo" });
+          if (historyArr.length > 4) historyArr.pop();
+          renderHistory();
+        } catch (e) {
+          errorBox.classList.add("visible");
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M22 2L12 12"/><path d="M16 2h6v6"/></svg> Calcular precio`;
+      }
+
+      function renderHistory() {
+        const sec = document.getElementById("history-section");
+        const list = document.getElementById("history-list");
+        if (historyArr.length === 0) { sec.style.display = "none"; return; }
+        sec.style.display = "flex";
+        list.innerHTML = "";
+        historyArr.forEach((h) => {
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML = `
+            <div class="history-left">
+              <span class="history-info">${h.label}</span>
+              <span class="history-price">${h.price}</span>
+            </div>
+            <span class="history-tag">${h.type}</span>`;
+          list.appendChild(item);
+        });
+      }
+    </script>
+  </body>
+</html>
